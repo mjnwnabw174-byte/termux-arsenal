@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termux Arsenal | ترسانة التيرمكس</title>
+    <style>
+        :root {
+            --bg-dark: #0a0e14;
+            --term-bg: #000000;
+            --neon-green: #00ff41;
+            --neon-cyan: #00e5ff;
+            --card-bg: #121820;
+            --text-light: #e6edf3;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Tahoma, monospace; }
+        body { background-color: var(--bg-dark); color: var(--text-light); padding: 15px; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+        
+        /* الهيدر */
+        .header { text-align: center; padding: 20px 10px; border-bottom: 1px solid #1f2937; margin-bottom: 20px; }
+        .header h1 { color: var(--neon-green); font-size: 1.6rem; text-shadow: 0 0 10px rgba(0,255,65,0.4); }
+        .header p { color: #8b949e; font-size: 0.9rem; margin-top: 5px; }
+
+        /* نافذة التيرمكس التفاعلية */
+        .terminal-window {
+            background: var(--term-bg);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+            margin-bottom: 20px;
+            direction: ltr;
+            text-align: left;
+        }
+        .term-header {
+            background: #161b22;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #30363d;
+        }
+        .dots { display: flex; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        .term-title { color: #8b949e; font-size: 0.8rem; }
+        
+        .term-body {
+            padding: 15px;
+            height: 260px;
+            overflow-y: auto;
+            color: var(--neon-green);
+            font-size: 0.85rem;
+        }
+        .term-line { margin-bottom: 6px; word-wrap: break-word; }
+        .cmd-input-area {
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #21262d;
+            padding: 8px 15px;
+            background: #050505;
+        }
+        .prompt { color: var(--neon-cyan); margin-right: 8px; font-weight: bold; }
+        #cmdInput {
+            background: transparent;
+            border: none;
+            color: var(--neon-green);
+            width: 100%;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        /* أزرار الأدوات */
+        .section-title { color: var(--neon-cyan); font-size: 1.1rem; margin-bottom: 12px; border-right: 3px solid var(--neon-cyan); padding-right: 8px; }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .tool-btn {
+            background: var(--card-bg);
+            border: 1px solid #30363d;
+            color: var(--text-light);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: right;
+        }
+        .tool-btn:hover, .tool-btn:active { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,65,0.2); }
+        .tool-btn h4 { color: var(--neon-green); font-size: 0.95rem; margin-bottom: 4px; }
+        .tool-btn p { font-size: 0.75rem; color: #8b949e; }
+
+        /* صندوق نسخ الكود */
+        .copy-box {
+            background: #161b22;
+            border: 1px dashed var(--neon-cyan);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            display: none;
+        }
+        .copy-box pre { direction: ltr; text-align: left; color: #fff; font-size: 0.8rem; overflow-x: auto; margin-bottom: 10px; padding: 8px; background: #000; border-radius: 4px; }
+        .btn-copy { background: var(--neon-cyan); color: #000; border: none; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
+
+        /* قسم الواتساب */
+        .whatsapp-card {
+            background: linear-gradient(145deg, #0d1f17, #121820);
+            border: 1px solid #25d366;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .whatsapp-card h3 { color: #25d366; margin-bottom: 8px; font-size: 1.1rem; }
+        .form-group { margin-bottom: 10px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0a0e14;
+            border: 1px solid #30363d;
+            border-radius: 5px;
+            color: #fff;
+            outline: none;
+        }
+        .btn-wa {
+            background: #25d366;
+            color: #000;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn-group {
+            background: transparent;
+            border: 1px solid #25d366;
+            color: #25d366;
+            padding: 10px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .btn-group:hover {
+            background: rgba(37, 211, 102, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>⚡ TERMUX ARSENAL ⚡</h1>
+        <p>المحاكي التفاعلي ومكتبة أدوات التيرمكس والأمن السيبراني</p>
+    </div>
+
+    <!-- شاشة التيرمكس -->
+    <div class="terminal-window">
+        <div class="term-header">
+            <div class="dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="term-title">root@itali-cyber-lab:~ (bash)</div>
+        </div>
+        <div class="term-body" id="termBody">
+            <div class="term-line">Welcome to Termux Interactive Simulator v3.0</div>
+            <div class="term-line">Type <span style="color:#00e5ff">'help'</span> for commands or click any tool below...</div>
+            <div class="term-line">------------------------------------------------</div>
+        </div>
+        <div class="cmd-input-area">
+            <span class="prompt">$</span>
+            <input type="text" id="cmdInput" placeholder="اكتب أمراً مثل help أو clear ثم اضغط Enter..." autocomplete="off">
+        </div>
+    </div>
+
+    <!-- صندوق نسخ أوامر التثبيت -->
+    <div class="copy-box" id="copyBox">
+        <div style="color: var(--neon-cyan); font-size: 0.85rem; margin-bottom: 5px;">📋 كود التثبيت الحقيقي لتطبيقه في Termux:</div>
+        <pre id="installCode"></pre>
+        <button class="btn-copy" onclick="copyInstallCode()">نسخ الأوامر للتيرمكس</button>
+    </div>
+
+    <!-- قائمة الأدوات -->
+    <h3 class="section-title">🛠️ اختر أداة لتجربتها في المحاكي ونسخ كودها:</h3>
+    <div class="tools-grid">
+        <div class="tool-btn" onclick="runTool('basic')">
+            <h4>⚙️ التجهيز الأساسي</h4>
+            <p>تحديث الحزم وتثبيت الأساسيات (Python, Git)</p>
+        </div>
+        <div class="tool-btn" onclick="runTool('nmap')">
+            <h4>🌐 فاحص الشبكات Nmap</h4>
+            <p>فحص البورتات والسيرفرات واكتشاف الأجهزة</p>
+        </div>
+        <div class="tool-btn" onclick="runTool('osint')">
+            <h4>🕵️‍♂️ صائد الحسابات Sherlock</h4>
+            <p>البحث عن أي يوزر في جميع مواقع التواصل</p>
+        </div>
+        <div class="tool-btn" onclick="runTool('zsh')">
+            <h4>🎨 ثيم الهكر الاحترافي</h4>
+            <p>تحويل شكل التيرمكس إلى واجهة كالي المظلمة</p>
+        </div>
+    </div>
+
+    <!-- قسم الربط بالواتساب -->
+    <div class="whatsapp-card">
+        <h3>💬 تواصل مع المطور أو اطلب أداة خاصة</h3>
+        <p style="font-size: 0.8rem; color: #8b949e; margin-bottom: 12px;">واجهتك مشكلة في التيرمكس؟ أو تريد برمجة سكربت خاص؟ أرسلها مباشرة للواتساب:</p>
+        
+        <div class="form-group">
+            <input type="text" id="visitorName" placeholder="اسمك أو لقبك...">
+        </div>
+        <div class="form-group">
+            <select id="msgType">
+                <option value="طلب أداة أو سكربت">🛠️ طلب أداة أو سكربت</option>
+                <option value="حل مشكلة في التيرمكس">⚠️ حل مشكلة في التيرمكس</option>
+                <option value="انضمام لفريق المطورين">🤝 انضمام ومشاركة إبداع</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <textarea id="visitorMsg" rows="3" placeholder="اكتب تفاصيل طلبك أو مشكلتك هنا..."></textarea>
+        </div>
+        
+        <button class="btn-wa" onclick="sendToWhatsApp()">🚀 إرسال مباشر للمطور عبر واتساب</button>
+        
+        <a href="https://whatsapp.com/channel/0029VbDk2BfInlqUNurOyP0E" target="_blank" class="btn-group">🔥 اشترك في قناتنا الرسمية على واتساب</a>
+    </div>
+
+    <script>
+        // رقم الواتساب المربوط (مع مفتاح اليمن 967)
+        const MY_WHATSAPP_NUMBER = "967771381247";
+
+        const termBody = document.getElementById('termBody');
+        const copyBox = document.getElementById('copyBox');
+        const installCode = document.getElementById('installCode');
+
+        const toolsData = {
+            basic: {
+                sim: [
+                    "$ pkg update && pkg upgrade -y",
+                    "Checking repositories... Done.",
+                    "$ pkg install git python nodejs curl -y",
+                    "Installing Python 3.11... [##########] 100%",
+                    "Installing Git... [##########] 100%",
+                    "[✔] Termux environment is ready for hacking tools!"
+                ],
+                code: "pkg update && pkg upgrade -y && pkg install git python curl wget -y"
+            },
+            nmap: {
+                sim: [
+                    "$ pkg install nmap -y",
+                    "$ nmap -sV --script=banner target.com",
+                    "Starting Nmap 7.94...",
+                    "PORT     STATE SERVICE VERSION",
+                    "22/tcp   open  ssh     OpenSSH 8.9",
+                    "80/tcp   open  http    cloudflare",
+                    "443/tcp  open  ssl/http cloudflare",
+                    "[✔] Scan completed: 1 IP address (1 host up)."
+                ],
+                code: "pkg install nmap -y && nmap --help"
+            },
+            osint: {
+                sim: [
+                    "$ git clone https://github.com/sherlock-project/sherlock.git",
+                    "$ python3 sherlock user_target",
+                    "[*] Checking username user_target on:",
+                    "[+] Instagram: https://instagram.com/user_target",
+                    "[+] Telegram: https://t.me/user_target",
+                    "[+] GitHub: https://github.com/user_target",
+                    "[✔] Search completed with 3 results!"
+                ],
+                code: "pkg install git python -y && pip install sherlock-project && sherlock --help"
+            },
+            zsh: {
+                sim: [
+                    "$ sh -c \"$(curl -fsSL https://raw.github.com/ohmyzsh/install.sh)\"",
+                    "Applying Dark Cyberpunk Theme...",
+                    "Updating font to FiraCode Nerd Font...",
+                    "[✔] Theme applied successfully! Restart Termux."
+                ],
+                code: "pkg install zsh git curl -y && chsh -s zsh"
+            }
+        };
+
+        function printLine(text, color = "#00ff41") {
+            const div = document.createElement('div');
+            div.className = 'term-line';
+            div.style.color = color;
+            div.textContent = text;
+            termBody.appendChild(div);
+            termBody.scrollTop = termBody.scrollHeight;
+        }
+
+        function runTool(key) {
+            const tool = toolsData[key];
+            termBody.innerHTML = '';
+            copyBox.style.display = 'block';
+            installCode.textContent = tool.code;
+
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < tool.sim.length) {
+                    const line = tool.sim[i];
+                    const color = line.startsWith('$') ? '#00e5ff' : (line.startsWith('[✔]') ? '#ffbd2e' : '#00ff41');
+                    printLine(line, color);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 350);
+        }
+
+        function copyInstallCode() {
+            navigator.clipboard.writeText(installCode.textContent);
+            alert("تم نسخ الأوامر! افتح Termux والصقها هناك.");
+        }
+
+        // الأوامر اليدوية في المحاكي
+        document.getElementById('cmdInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = this.value.trim().toLowerCase();
+                printLine("$ " + this.value, "#00e5ff");
+                this.value = '';
+
+                if (cmd === 'help') {
+                    printLine("Available commands: help, clear, whoami, date, contact");
+                } else if (cmd === 'clear') {
+                    termBody.innerHTML = '';
+                } else if (cmd === 'whoami') {
+                    printLine("root@itali-cyber-arsenal");
+                } else if (cmd === 'date') {
+                    printLine(new Date().toUTCString());
+                } else if (cmd === 'contact') {
+                    printLine("Scroll down to send a direct WhatsApp message to the developer!", "#ffbd2e");
+                } else if (cmd !== '') {
+                    printLine("bash: " + cmd + ": command simulated. Click a tool below for full code.", "#ff5f56");
+                }
+            }
+        });
+
+        // دالة الإرسال للواتساب بدون سيرفر
+        function sendToWhatsApp() {
+            const name = document.getElementById('visitorName').value.trim() || "زائر من الموقع";
+            const type = document.getElementById('msgType').value;
+            const msg = document.getElementById('visitorMsg').value.trim();
+
+            if (!msg) {
+                alert("يرجى كتابة رسالتك أو طلبك أولاً!");
+                return;
+            }
+
+            const fullText = `*رسالة جديدة من موقع Termux Arsenal* ⚡\n\n` +
+                             `👤 *الاسم:* ${name}\n` +
+                             `📌 *القسم:* ${type}\n` +
+                             `📝 *الرسالة:* \n${msg}`;
+
+            const encodedText = encodeURIComponent(fullText);
+            const waUrl = `https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodedText}`;
+            window.open(waUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
